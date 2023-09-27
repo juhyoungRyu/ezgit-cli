@@ -78,7 +78,7 @@ async function gitPush() {
   await $`git commit -m ${commitMessage}`;
   endSpin("Success");
 
-  runSpin("now push..");
+  runSpin("now push...");
   await $`git push origin ${await $`git branch --show-current`}`;
   endSpin("Success");
 }

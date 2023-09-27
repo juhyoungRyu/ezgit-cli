@@ -61,7 +61,7 @@ function gitPush() {
         runSpin("Write commit message...");
         yield $ `git commit -m ${commitMessage}`;
         endSpin("Success");
-        runSpin("now push..");
+        runSpin("now push...");
         yield $ `git push origin ${yield $ `git branch --show-current`}`;
         endSpin("Success");
     });
