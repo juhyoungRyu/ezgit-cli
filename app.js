@@ -87,6 +87,9 @@ function gitPull() {
                 yield $ `git pull origin ${originBranch}`;
                 endSpin("Success");
             }
+            else {
+                console.log("❌ Cancel Action");
+            }
         }
         else {
             runSpin("now pull..");

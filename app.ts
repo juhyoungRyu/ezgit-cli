@@ -113,6 +113,8 @@ async function gitPull() {
         runSpin(`merging...`);
         await $`git pull origin ${originBranch}`;
         endSpin("Success");
+      } else {
+        console.log("❌ Cancel Action")
       }
   } else {
     runSpin("now pull..");
