@@ -24,7 +24,7 @@ const globalObj = {
 function runSpin(startText: string) {
   globalObj.spinner = ora({
     text: startText,
-    spinner: spinners.earth,
+    spinner: spinners.bouncingBar,
   }).start();
 }
 
