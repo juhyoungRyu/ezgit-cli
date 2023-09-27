@@ -33,6 +33,10 @@ function runSpin(startText) {
 function endSpin(endText) {
     globalObj.spinner.succeed(endText);
 }
+function stopSpin(error) {
+    globalObj.spinner.fail('Sorry, i have error...');
+    console.log(error);
+}
 function callCli(cli) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield inquirer.prompt([
@@ -66,7 +70,7 @@ function main() {
             }
         }
         catch (error) {
-            console.error("An error occurred:", error);
+            stopSpin(error);
         }
     });
 }

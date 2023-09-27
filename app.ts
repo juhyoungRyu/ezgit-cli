@@ -28,6 +28,11 @@ function endSpin(endText: string) {
   globalObj.spinner.succeed(endText);
 }
 
+function stopSpin(error:any) {
+    globalObj.spinner.fail('Sorry, i have error...')
+    console.log(error)
+}
+
 interface Cli {
   type:
     | "checkbox"
@@ -87,7 +92,7 @@ async function main() {
         //test commit
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    stopSpin(error)
   }
 }
 
