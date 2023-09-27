@@ -65,7 +65,7 @@ async function callCli(cli: Cli) {
 }
 
 async function gitPush() {
-  console.log("Stage All Changes...");
+  console.log("⭕  Staging All Changes");
   await $`git add .`;
 
   const { commitMessage } = await callCli({

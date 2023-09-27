@@ -55,7 +55,7 @@ function callCli(cli) {
 }
 function gitPush() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("Stage All Changes...");
+        console.log("⭕  Staging All Changes");
         yield $ `git add .`;
         const { commitMessage } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "commitMessage", message: "Please input your commit message : " }));
         runSpin("Write commit message...");
