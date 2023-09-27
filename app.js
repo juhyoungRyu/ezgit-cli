@@ -73,12 +73,13 @@ function gitPull() {
                 .split("\n")
                 .map((branch) => branch.trim())
                 .filter((branch) => branch.substring(0, 7) !== "remotes") }));
-        if (typeof originBranch !== "string")
+        if (typeof originBranch != "string")
             return;
         if (originBranch.substring(0, 1) === "*") {
             originBranch = originBranch.substring(2, originBranch.length);
         }
-        if (originBranch !== (yield $ `git branch --show-current`)) {
+        const { stdout: stdout2 } = yield $ `git branch --show-current`; // 자료형이 object라 꺼내지 않으면 비교 불가
+        if (originBranch !== stdout2) {
             const { doMerge } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "doMerge", message: "Do you want to do [Merge]? (Y/N)" }));
             if (typeof originBranch !== "string")
                 return;

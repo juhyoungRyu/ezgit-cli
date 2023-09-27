@@ -96,12 +96,14 @@ async function gitPull() {
       .filter((branch) => branch.substring(0, 7) !== "remotes"),
   });
 
-  if (typeof originBranch !== "string") return;
+  if (typeof originBranch != "string") return;
   if(originBranch.substring(0,1) === "*") {
     originBranch = originBranch.substring(2, originBranch.length)
   }
 
-  if(originBranch !== await $`git branch --show-current`) {
+  const { stdout : stdout2 } = await $`git branch --show-current` // 자료형이 object라 꺼내지 않으면 비교 불가
+
+  if(originBranch !== stdout2) {
       const { doMerge } = await callCli({
         ...globalObj.cliModel.inputModel,
         name: "doMerge",
