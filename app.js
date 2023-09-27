@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import ora from "ora";
+import spinners from "cli-spinners";
 import inquirer from "inquirer";
 import { $ } from "execa";
 const globalObj = {
@@ -28,13 +29,16 @@ const globalObj = {
     },
 };
 function runSpin(startText) {
-    globalObj.spinner = ora(startText).start();
+    globalObj.spinner = ora({
+        text: startText,
+        spinner: spinners.earth,
+    }).start();
 }
 function endSpin(endText) {
     globalObj.spinner.succeed(endText);
 }
 function stopSpin(error) {
-    globalObj.spinner.fail('Sorry, i have error...');
+    globalObj.spinner.fail("Sorry, i have error...");
     console.log(error);
 }
 function callCli(cli) {
@@ -58,14 +62,14 @@ function main() {
             if (command.toLowerCase() === "push") {
                 runSpin("Stage All Changes...");
                 yield $ `git add .`;
-                endSpin('Compleate');
+                endSpin("Compleate");
                 const { commitMessage } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "commitMessage", message: "Please input your commit message : " }));
                 runSpin("Write commit message...");
                 yield $ `git commit -m ${commitMessage}`;
-                endSpin('Compleate');
+                endSpin("Compleate");
                 runSpin("now push..");
                 yield $ `git push origin ${yield $ `git branch --show-current`}`;
-                endSpin('Compleate');
+                endSpin("Compleate");
                 //test commit
             }
         }

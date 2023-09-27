@@ -1,4 +1,5 @@
 import ora from "ora";
+import spinners from "cli-spinners";
 import inquirer from "inquirer";
 import { $ } from "execa";
 
@@ -21,16 +22,19 @@ const globalObj = {
 };
 
 function runSpin(startText: string) {
-  globalObj.spinner = ora(startText).start();
+  globalObj.spinner = ora({
+    text: startText,
+    spinner: spinners.earth,
+  }).start();
 }
 
 function endSpin(endText: string) {
   globalObj.spinner.succeed(endText);
 }
 
-function stopSpin(error:any) {
-    globalObj.spinner.fail('Sorry, i have error...')
-    console.log(error)
+function stopSpin(error: any) {
+  globalObj.spinner.fail("Sorry, i have error...");
+  console.log(error);
 }
 
 interface Cli {
@@ -72,27 +76,27 @@ async function main() {
     if (typeof command !== "string") return;
 
     if (command.toLowerCase() === "push") {
-        runSpin("Stage All Changes...")
-        await $`git add .`;
-        endSpin('Compleate')
+      runSpin("Stage All Changes...");
+      await $`git add .`;
+      endSpin("Compleate");
 
-        const {commitMessage} = await callCli({
-            ...globalObj.cliModel.inputModel,
-            name: "commitMessage",
-            message: "Please input your commit message : ",
-          });
+      const { commitMessage } = await callCli({
+        ...globalObj.cliModel.inputModel,
+        name: "commitMessage",
+        message: "Please input your commit message : ",
+      });
 
-        runSpin("Write commit message...")
-        await $`git commit -m ${commitMessage}`;
-        endSpin('Compleate')
+      runSpin("Write commit message...");
+      await $`git commit -m ${commitMessage}`;
+      endSpin("Compleate");
 
-        runSpin("now push..")
-        await $`git push origin ${await $`git branch --show-current`}`;
-        endSpin('Compleate')
-        //test commit
+      runSpin("now push..");
+      await $`git push origin ${await $`git branch --show-current`}`;
+      endSpin("Compleate");
+      //test commit
     }
   } catch (error) {
-    stopSpin(error)
+    stopSpin(error);
   }
 }
 
