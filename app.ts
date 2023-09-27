@@ -89,7 +89,7 @@ async function gitPull() {
   let { originBranch } = await callCli({
     ...globalObj.cliModel.listModel,
     name: "originBranch",
-    message: "Select the destination branch you want to [Pull]",
+    message: "Select the target branch for [Pull]",
     choices: stdout
       .split("\n")
       .map((branch) => branch.trim())
@@ -101,9 +101,25 @@ async function gitPull() {
     originBranch = originBranch.substring(2, originBranch.length)
   }
 
-  runSpin(`now pull ${originBranch}..`);
-  await $`git pull origin ${originBranch}`;
-  endSpin("Success");
+  if(originBranch !== await $`git branch --show-current`) {
+      const { doMerge } = await callCli({
+        ...globalObj.cliModel.inputModel,
+        name: "doMerge",
+        message: "Do you want to do [Merge]? (Y/N)",
+      });
+    
+      if (typeof originBranch !== "string") return;
+      if(doMerge.toLowerCase() === 'y') {
+        runSpin(`merging...`);
+        await $`git pull origin ${originBranch}`;
+        endSpin("Success");
+      }
+  } else {
+    runSpin("now pull..");
+    await $`git pull`;
+    endSpin("Success");
+  }
+
 }
 
 /**
@@ -128,8 +144,6 @@ async function main() {
         await gitPull();
         break;
     }
-
-    console.log('end action')
   } catch (error) {
     stopSpin(error);
   }

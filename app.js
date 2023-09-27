@@ -69,7 +69,7 @@ function gitPush() {
 function gitPull() {
     return __awaiter(this, void 0, void 0, function* () {
         const { stdout } = yield $ `git branch -a`;
-        let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the destination branch you want to [Pull]", choices: stdout
+        let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the target branch for [Pull]", choices: stdout
                 .split("\n")
                 .map((branch) => branch.trim())
                 .filter((branch) => branch.substring(0, 7) !== "remotes") }));
@@ -78,9 +78,21 @@ function gitPull() {
         if (originBranch.substring(0, 1) === "*") {
             originBranch = originBranch.substring(2, originBranch.length);
         }
-        runSpin(`now pull ${originBranch}..`);
-        yield $ `git pull origin ${originBranch}`;
-        endSpin("Success");
+        if (originBranch !== (yield $ `git branch --show-current`)) {
+            const { doMerge } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "doMerge", message: "Do you want to do [Merge]? (Y/N)" }));
+            if (typeof originBranch !== "string")
+                return;
+            if (doMerge.toLowerCase() === 'y') {
+                runSpin(`merging...`);
+                yield $ `git pull origin ${originBranch}`;
+                endSpin("Success");
+            }
+        }
+        else {
+            runSpin("now pull..");
+            yield $ `git pull`;
+            endSpin("Success");
+        }
     });
 }
 /**
@@ -100,7 +112,6 @@ function main() {
                     yield gitPull();
                     break;
             }
-            console.log('end action');
         }
         catch (error) {
             stopSpin(error);
