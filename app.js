@@ -60,8 +60,7 @@ function main() {
                 yield $ `git commit -m ${commitMessage}`;
                 endSpin('Compleate');
                 runSpin("now push..");
-                const nowBranch = yield $ `git branch --show-current`;
-                yield $ `git push origin ${nowBranch}`;
+                yield $ `git push origin ${yield $ `git branch --show-current`}`;
                 endSpin('Compleate');
                 //test commit
             }

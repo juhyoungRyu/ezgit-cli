@@ -82,9 +82,7 @@ async function main() {
         endSpin('Compleate')
 
         runSpin("now push..")
-
-        const nowBranch = await $`git branch --show-current`
-        await $`git push origin ${nowBranch}`;
+        await $`git push origin ${await $`git branch --show-current`}`;
         endSpin('Compleate')
         //test commit
     }
