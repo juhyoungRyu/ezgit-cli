@@ -67,9 +67,9 @@ async function main() {
     if (typeof command !== "string") return;
 
     if (command.toLowerCase() === "push") {
-        runSpin("커밋 목록에 수정 파일 추가 중...")
+        runSpin("Stage All Changes...")
         await $`git add .`;
-        endSpin('완료')
+        endSpin('Compleate')
 
         const {commitMessage} = await callCli({
             ...globalObj.cliModel.inputModel,
@@ -77,10 +77,16 @@ async function main() {
             message: "Please input your commit message : ",
           });
 
-        runSpin("커밋 메세지 작성중...")
+        runSpin("Write commit message...")
         await $`git commit -m ${commitMessage}`;
-        endSpin('완료')
-        //ss
+        endSpin('Compleate')
+
+        runSpin("now push..")
+
+        const nowBranch = await $`git branch --show-current`
+        await $`git push origin ${nowBranch}`;
+        endSpin('Compleate')
+        //test commit
     }
   } catch (error) {
     console.error("An error occurred:", error);
