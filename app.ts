@@ -86,7 +86,7 @@ async function gitPush() {
 async function gitPull() {
   const { stdout } = await $`git branch -a`;
 
-  const { originBranch } = await callCli({
+  let { originBranch } = await callCli({
     ...globalObj.cliModel.listModel,
     name: "originBranch",
     message: "Select the destination branch you want to [Pull]",
@@ -95,6 +95,11 @@ async function gitPull() {
       .map((branch) => branch.trim())
       .filter((branch) => branch.substring(0, 7) !== "remotes"),
   });
+
+  if (typeof originBranch !== "string") return;
+  if(originBranch.substring(0,1) === "*") {
+    originBranch = originBranch.substring(2, originBranch.length)
+  }
 
   runSpin(`now pull ${originBranch}..`);
   await $`git pull origin ${originBranch}`;

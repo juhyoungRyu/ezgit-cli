@@ -69,10 +69,15 @@ function gitPush() {
 function gitPull() {
     return __awaiter(this, void 0, void 0, function* () {
         const { stdout } = yield $ `git branch -a`;
-        const { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the destination branch you want to [Pull]", choices: stdout
+        let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the destination branch you want to [Pull]", choices: stdout
                 .split("\n")
                 .map((branch) => branch.trim())
                 .filter((branch) => branch.substring(0, 7) !== "remotes") }));
+        if (typeof originBranch !== "string")
+            return;
+        if (originBranch.substring(0, 1) === "*") {
+            originBranch = originBranch.substring(2, originBranch.length);
+        }
         runSpin(`now pull ${originBranch}..`);
         yield $ `git pull origin ${originBranch}`;
         endSpin("Success");
