@@ -128,6 +128,8 @@ async function main() {
         await gitPull();
         break;
     }
+
+    console.log('end action')
   } catch (error) {
     stopSpin(error);
   }

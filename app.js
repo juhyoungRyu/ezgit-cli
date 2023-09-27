@@ -100,6 +100,7 @@ function main() {
                     yield gitPull();
                     break;
             }
+            console.log('end action');
         }
         catch (error) {
             stopSpin(error);
