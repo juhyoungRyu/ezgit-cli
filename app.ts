@@ -1,4 +1,5 @@
 import ora from "ora";
+import spinners from "cli-spinners";
 import inquirer from "inquirer";
 import { $ } from "execa";
 
@@ -21,11 +22,19 @@ const globalObj = {
 };
 
 function runSpin(startText: string) {
-  globalObj.spinner = ora(startText).start();
+  globalObj.spinner = ora({
+    text: startText,
+    spinner: spinners.bouncingBar,
+  }).start();
 }
 
 function endSpin(endText: string) {
   globalObj.spinner.succeed(endText);
+}
+
+function stopSpin(error: any) {
+  globalObj.spinner.fail("Sorry, i have error...");
+  console.log(error);
 }
 
 interface Cli {
@@ -55,39 +64,67 @@ async function callCli(cli: Cli) {
   ]);
 }
 
+async function gitPush() {
+  console.log("⭕  Staging All Changes");
+  await $`git add .`;
+
+  const { commitMessage } = await callCli({
+    ...globalObj.cliModel.inputModel,
+    name: "commitMessage",
+    message: "Please input your commit message : ",
+  });
+
+  runSpin("Write commit message...");
+  await $`git commit -m ${commitMessage}`;
+  endSpin("Success");
+
+  runSpin("now push..");
+  await $`git push origin ${await $`git branch --show-current`}`;
+  endSpin("Success");
+}
+
+async function gitPull() {
+  const { stdout } = await $`git branch -a`;
+
+  const { originBranch } = await callCli({
+    ...globalObj.cliModel.listModel,
+    name: "originBranch",
+    message: "Select the destination branch you want to [Pull]",
+    choices: stdout
+      .split("\n")
+      .map((branch) => branch.trim())
+      .filter((branch) => branch.substring(0, 7) !== "remotes"),
+  });
+
+  runSpin(`now pull ${originBranch}..`);
+  await $`git pull origin ${originBranch}`;
+  endSpin("Success");
+}
+
+/**
+ *
+ */
 async function main() {
   try {
     const { command } = await callCli({
       ...globalObj.cliModel.listModel,
       name: "command",
       message: "Please choose the action you want : ",
-      choices: ["Push"],
+      choices: ["Push", "Pull"],
     });
 
     if (typeof command !== "string") return;
 
-    if (command.toLowerCase() === "push") {
-        runSpin("Stage All Changes...")
-        await $`git add .`;
-        endSpin('Compleate')
-
-        const {commitMessage} = await callCli({
-            ...globalObj.cliModel.inputModel,
-            name: "commitMessage",
-            message: "Please input your commit message : ",
-          });
-
-        runSpin("Write commit message...")
-        await $`git commit -m ${commitMessage}`;
-        endSpin('Compleate')
-
-        runSpin("now push..")
-        await $`git push origin ${await $`git branch --show-current`}`;
-        endSpin('Compleate')
-        //test commit
+    switch (command.toLowerCase()) {
+      case "push":
+        await gitPush();
+        break;
+      case "pull":
+        await gitPull();
+        break;
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    stopSpin(error);
   }
 }
 

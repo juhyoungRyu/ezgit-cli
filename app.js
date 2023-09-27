@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import ora from "ora";
+import spinners from "cli-spinners";
 import inquirer from "inquirer";
 import { $ } from "execa";
 const globalObj = {
@@ -28,10 +29,17 @@ const globalObj = {
     },
 };
 function runSpin(startText) {
-    globalObj.spinner = ora(startText).start();
+    globalObj.spinner = ora({
+        text: startText,
+        spinner: spinners.bouncingBar,
+    }).start();
 }
 function endSpin(endText) {
     globalObj.spinner.succeed(endText);
+}
+function stopSpin(error) {
+    globalObj.spinner.fail("Sorry, i have error...");
+    console.log(error);
 }
 function callCli(cli) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -45,28 +53,51 @@ function callCli(cli) {
         ]);
     });
 }
+function gitPush() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("⭕  Staging All Changes");
+        yield $ `git add .`;
+        const { commitMessage } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "commitMessage", message: "Please input your commit message : " }));
+        runSpin("Write commit message...");
+        yield $ `git commit -m ${commitMessage}`;
+        endSpin("Success");
+        runSpin("now push..");
+        yield $ `git push origin ${yield $ `git branch --show-current`}`;
+        endSpin("Success");
+    });
+}
+function gitPull() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { stdout } = yield $ `git branch -a`;
+        const { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the destination branch you want to [Pull]", choices: stdout
+                .split("\n")
+                .map((branch) => branch.trim())
+                .filter((branch) => branch.substring(0, 7) !== "remotes") }));
+        runSpin(`now pull ${originBranch}..`);
+        yield $ `git pull origin ${originBranch}`;
+        endSpin("Success");
+    });
+}
+/**
+ *
+ */
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { command } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "command", message: "Please choose the action you want : ", choices: ["Push"] }));
+            const { command } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "command", message: "Please choose the action you want : ", choices: ["Push", "Pull"] }));
             if (typeof command !== "string")
                 return;
-            if (command.toLowerCase() === "push") {
-                runSpin("Stage All Changes...");
-                yield $ `git add .`;
-                endSpin('Compleate');
-                const { commitMessage } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.inputModel), { name: "commitMessage", message: "Please input your commit message : " }));
-                runSpin("Write commit message...");
-                yield $ `git commit -m ${commitMessage}`;
-                endSpin('Compleate');
-                runSpin("now push..");
-                yield $ `git push origin ${yield $ `git branch --show-current`}`;
-                endSpin('Compleate');
-                //test commit
+            switch (command.toLowerCase()) {
+                case "push":
+                    yield gitPush();
+                    break;
+                case "pull":
+                    yield gitPull();
+                    break;
             }
         }
         catch (error) {
-            console.error("An error occurred:", error);
+            stopSpin(error);
         }
     });
 }
