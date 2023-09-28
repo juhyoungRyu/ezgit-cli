@@ -7,11 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "ezgit": "./app.js"
+    "ez": "./app.js"
   },
   "type": "module",
   "keywords": [],
-  "author": "",
+  "author": "siaRyu <thinkoutside2004@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@types/inquirer": "^9.0.3",
