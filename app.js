@@ -54,7 +54,7 @@ function callCli(cli) {
     });
 }
 /**
- * 현재 수정 목록 전체를 staging 후 커밋 메시지를 작성하면 push를 자동으로 수행합니다.
+ * 수정 사항 staging과 push를 자동으로 수행합니다. ( 커밋 메세지는 입력받습니다. )
  */
 function push() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -70,7 +70,7 @@ function push() {
     });
 }
 /**
- *
+ * 선택한 브랜치로 현재 브랜치 변경 후 원격 저장소에서 pull을 수행합니다.
  */
 function pull() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -117,8 +117,25 @@ function pull() {
         }
     });
 }
+/**
+ * 지정한 브랜치로 checkout을 수행합니다.
+ */
 function checkout() {
-    return __awaiter(this, void 0, void 0, function* () { });
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { stdout } = yield $ `git branch -a`;
+            let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the target branch", choices: stdout
+                    .split("\n")
+                    .map((branch) => branch.trim())
+                    .filter((branch) => branch.substring(0, 7) !== "remotes") }));
+            runSpin(`change selected branch...`);
+            yield $ `git checkout ${originBranch}`;
+            endSpin(`Success`);
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    });
 }
 function manageBranch() {
     return __awaiter(this, void 0, void 0, function* () { });
@@ -130,7 +147,7 @@ function manageBranch() {
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { command } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "command", message: "Please choose the action you want : ", choices: ["Push", "Pull"] }));
+            const { command } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "command", message: "Please choose the action you want : ", choices: ["Push", "Pull", "CheckOut"] }));
             if (typeof command !== "string")
                 return;
             switch (command.toLowerCase()) {
@@ -139,6 +156,9 @@ function main() {
                     break;
                 case "pull":
                     yield pull();
+                    break;
+                case "checkout":
+                    yield checkout();
                     break;
             }
         }
