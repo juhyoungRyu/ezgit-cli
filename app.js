@@ -53,7 +53,10 @@ function callCli(cli) {
         ]);
     });
 }
-function gitPush() {
+/**
+ * 현재 수정 목록 전체를 staging 후 커밋 메시지를 작성하면 push를 자동으로 수행합니다.
+ */
+function push() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("⭕  Staging All Changes");
         yield $ `git add .`;
@@ -66,7 +69,10 @@ function gitPush() {
         endSpin("Success");
     });
 }
-function gitPull() {
+/**
+ *
+ */
+function pull() {
     return __awaiter(this, void 0, void 0, function* () {
         const { stdout } = yield $ `git branch -a`;
         let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the target branch for [Pull]", choices: stdout
@@ -84,16 +90,19 @@ function gitPull() {
             if (typeof originBranch !== "string")
                 return;
             if (doMerge.toLowerCase() === 'y') {
-                runSpin(`Change Selected Branch...`);
+                runSpin(`change selected branch...`);
                 // await $`git pull origin ${originBranch}`;
                 yield $ `git checkout ${originBranch}`.then(() => __awaiter(this, void 0, void 0, function* () {
-                    endSpin("Success");
+                    endSpin("Success : Branch Changed");
                     runSpin(`now pull...`);
                     yield $ `git pull`.then(() => __awaiter(this, void 0, void 0, function* () {
-                        endSpin("Success");
-                        runSpin(`Back to the branch`);
+                        endSpin("Success : Pull");
+                        runSpin(`back to the branch...`);
                         yield $ `git checkout ${stdout2}`;
-                        endSpin("Success");
+                        endSpin("Success : Branch Changed");
+                        runSpin(`now merge...`);
+                        yield $ `git merge ${stdout2}`;
+                        endSpin("Success : Merge");
                     }));
                 })).catch((e) => endSpin(e.message));
             }
@@ -108,8 +117,15 @@ function gitPull() {
         }
     });
 }
+function checkout() {
+    return __awaiter(this, void 0, void 0, function* () { });
+}
+function manageBranch() {
+    return __awaiter(this, void 0, void 0, function* () { });
+}
 /**
- *
+ * ezgit의 메인 함수입니다.
+ * 최초 진입점이며, 선택지에 따라 수행되는 함수가 달라집니다.
  */
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -119,10 +135,10 @@ function main() {
                 return;
             switch (command.toLowerCase()) {
                 case "push":
-                    yield gitPush();
+                    yield push();
                     break;
                 case "pull":
-                    yield gitPull();
+                    yield pull();
                     break;
             }
         }

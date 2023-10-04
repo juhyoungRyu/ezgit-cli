@@ -64,7 +64,10 @@ async function callCli(cli: Cli) {
   ]);
 }
 
-async function gitPush() {
+/**
+ * 현재 수정 목록 전체를 staging 후 커밋 메시지를 작성하면 push를 자동으로 수행합니다.
+ */
+async function push() {
   console.log("⭕  Staging All Changes");
   await $`git add .`;
 
@@ -83,7 +86,10 @@ async function gitPush() {
   endSpin("Success");
 }
 
-async function gitPull() {
+/**
+ * 
+ */
+async function pull() {
   const { stdout } = await $`git branch -a`;
 
   let { originBranch } = await callCli({
@@ -112,18 +118,24 @@ async function gitPull() {
     
       if (typeof originBranch !== "string") return;
       if(doMerge.toLowerCase() === 'y') {
-        runSpin(`Change Selected Branch...`);
+        runSpin(`change selected branch...`);
         // await $`git pull origin ${originBranch}`;
         await $`git checkout ${originBranch}`.then(
           async () => {
-            endSpin("Success");
+            endSpin("Success : Branch Changed");
             runSpin(`now pull...`);
             await $`git pull`.then(
               async () => {
-              endSpin("Success");
-              runSpin(`Back to the branch`);
+              endSpin("Success : Pull");
+
+              runSpin(`back to the branch...`);
               await $`git checkout ${stdout2}`;
-              endSpin("Success");
+              endSpin("Success : Branch Changed");
+
+              runSpin(`now merge...`);
+              await $`git merge ${stdout2}`;
+              endSpin("Success : Merge");
+
             })
           }
         ).catch((e:any) => endSpin(e.message));
@@ -137,8 +149,13 @@ async function gitPull() {
   }
 }
 
+async function checkout() {}
+
+async function manageBranch() {}
+
 /**
- *
+ * ezgit의 메인 함수입니다.
+ * 최초 진입점이며, 선택지에 따라 수행되는 함수가 달라집니다.
  */
 async function main() {
   try {
@@ -153,10 +170,10 @@ async function main() {
 
     switch (command.toLowerCase()) {
       case "push":
-        await gitPush();
+        await push();
         break;
       case "pull":
-        await gitPull();
+        await pull();
         break;
     }
   } catch (error) {
