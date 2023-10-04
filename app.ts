@@ -135,7 +135,6 @@ async function gitPull() {
     await $`git pull`;
     endSpin("Success");
   }
-
 }
 
 /**
