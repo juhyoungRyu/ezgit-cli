@@ -127,7 +127,8 @@ function checkout() {
             let { originBranch } = yield callCli(Object.assign(Object.assign({}, globalObj.cliModel.listModel), { name: "originBranch", message: "Select the target branch", choices: stdout
                     .split("\n")
                     .map((branch) => branch.trim())
-                    .filter((branch) => branch.substring(0, 7) !== "remotes") }));
+                    .filter((branch) => branch.substring(0, 7) !== "remotes")
+                    .filter((branch) => branch.substring(0, 1) !== "*") }));
             runSpin(`change selected branch...`);
             yield $ `git checkout ${originBranch}`;
             endSpin(`Success`);

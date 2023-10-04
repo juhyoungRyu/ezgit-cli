@@ -162,10 +162,10 @@ async function checkout() {
       message: "Select the target branch",
       choices: stdout
         .split("\n")
-        .map((branch) => branch.trim())
-        .filter((branch) => branch.substring(0, 7) !== "remotes"),
+        .map((branch:string) => branch.trim())
+        .filter((branch:string) => branch.substring(0, 7) !== "remotes")
+        .filter((branch:string) => branch.substring(0, 1) !== "*"),
     });
-
     runSpin(`change selected branch...`);
     await $`git checkout ${originBranch}`;
     endSpin(`Success`)

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "ez": "./app.js"
+    "ez": "C:/Users/jhryu/Documents/ezgit/app.js"
   },
   "type": "module",
   "keywords": [],
