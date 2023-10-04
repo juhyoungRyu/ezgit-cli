@@ -112,14 +112,20 @@ async function gitPull() {
     
       if (typeof originBranch !== "string") return;
       if(doMerge.toLowerCase() === 'y') {
-        runSpin(`merging...`);
-        await $`git pull origin ${originBranch}`;
-        endSpin("Success");
+        runSpin(`Change Branch...`);
+        // await $`git pull origin ${originBranch}`;
+        await $`git checkout ${originBranch}`.then(
+          async () => {
+            endSpin("Success");
+            runSpin(`now pull...`);
+            await $`git pull`
+          }
+        ).catch((e) => endSpin(e.message));
       } else {
         console.log("❌ Cancel Action")
       }
   } else {
-    runSpin("now pull..");
+    runSpin("now pull...");
     await $`git pull`;
     endSpin("Success");
   }
